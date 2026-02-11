@@ -7,15 +7,20 @@ const usuarios = [
   { user: "capturador2", pass: "veh5678" },
   { user: "capturador3", pass: "veh5678" },
   { user: "capturador4", pass: "veh5678" },
-  { user: "capturador5", pass: "veh5678" }
+  { user: "capturador5", pass: "veh5678" },
+  { user: "capturador6", pass: "veh5678" },
+  { user: "capturador7", pass: "veh5678" },
+  { user: "capturador8", pass: "veh5678" },
+  { user: "capturador9", pass: "veh5678" },
+  { user: "capturador10", pass: "veh5678" }
 ];
 
 // ============================
 // LOGIN
 // ============================
 function login() {
-  const u = document.getElementById("usuario").value.trim();
-  const p = document.getElementById("password").value.trim();
+  const u = document.getElementById("usuario").value;
+  const p = document.getElementById("password").value;
 
   const valido = usuarios.find(x => x.user === u && x.pass === p);
 
@@ -42,13 +47,13 @@ function iniciarApp() {
     localStorage.getItem("usuarioActivo");
 }
 
-// Auto-login
+// Auto login
 if (localStorage.getItem("usuarioActivo")) {
   iniciarApp();
 }
 
 // ============================
-// BUSCADOR
+// BUSCADOR + CONTADOR
 // ============================
 let placas = [];
 let totalConsultas = 0;
@@ -59,19 +64,19 @@ const contadorDiv = document.getElementById("contador");
 const historialDiv = document.getElementById("historial");
 
 // ============================
-// CARGAR CSV (FIX EXCEL DEFINITIVO)
+// CARGA DEL CSV (FIX REAL)
 // ============================
 fetch("placas.csv")
   .then(r => r.text())
-  .then(texto => {
-    placas = texto
-      .replace(/\uFEFF/g, "")              // elimina BOM
-      .split(/\r?\n/)                      // líneas
-      .map(l => l.split(/[;,]/)[0])        // toma solo 1ra columna
-      .map(p => p.trim().toUpperCase())    // limpia
-      .filter(p => p.length > 0);
+  .then(data => {
+    placas = data
+      .replace(/\uFEFF/g, "")        // quita BOM de Excel
+      .split(/\r?\n/)                // separa filas
+      .map(l => l.split(/[;,]/)[0])  // toma solo la primera columna
+      .map(p => p.trim().toUpperCase())
+      .filter(p => p !== "");
 
-    console.log("PLACAS CARGADAS:", placas.slice(0, 10));
+    console.log("Placas cargadas:", placas);
   });
 
 // ============================
@@ -86,20 +91,20 @@ input.addEventListener("input", () => {
   totalConsultas++;
   contadorDiv.innerText = `Total de consultas: ${totalConsultas}`;
 
-  // Historial
   const h = document.createElement("div");
-  h.innerText = "🔎 " + busqueda;
+  h.innerText = "🔍 " + busqueda;
   historialDiv.appendChild(h);
 
-  // Coincidencias
-  const coincidencias = placas.filter(p => p.startsWith(busqueda));
+  const coincidencias = placas.filter(p =>
+    p.startsWith(busqueda)
+  );
 
   if (coincidencias.length > 0) {
     resultadoDiv.innerHTML =
-      `<span style="color:green;">✔ Coincidencias encontradas:</span><br><br>` +
+      `<strong>Placas encontradas:</strong><br><br>` +
       coincidencias.map(p => `🚗 ${p}`).join("<br>");
   } else {
     resultadoDiv.innerHTML =
-      `<span style="color:red;">❌ No se encontraron coincidencias</span>`;
+      "❌ No se encontraron coincidencias";
   }
 });
