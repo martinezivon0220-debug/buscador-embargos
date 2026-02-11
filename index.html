@@ -2,40 +2,41 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <title>Buscador de Embargos - EMBARGOS VEHÍCOL SAS</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EMBARGOS VEHÍCOL SAS</title>
 
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f4f8ff;
-      padding: 20px;
+      background: #f4f7fb;
       text-align: center;
+      padding-top: 60px;
     }
 
     h1 {
-      color: #0a3d91;
+      color: #0b3c91;
     }
 
     input {
-      padding: 10px;
-      width: 80%;
-      max-width: 300px;
-      margin-bottom: 10px;
-      font-size: 16px;
+      width: 300px;
+      padding: 12px;
+      font-size: 18px;
+      text-transform: uppercase;
     }
 
     button {
-      padding: 10px 20px;
+      margin-top: 15px;
+      padding: 10px 25px;
       font-size: 16px;
-      background: #0a3d91;
+      background: #0b3c91;
       color: white;
       border: none;
       border-radius: 5px;
+      cursor: pointer;
     }
 
     #resultado {
-      margin-top: 20px;
+      margin-top: 30px;
       font-size: 16px;
     }
   </style>
@@ -45,15 +46,15 @@
 
   <h1>EMBARGOS VEHÍCOL SAS</h1>
 
-  <input 
-    type="text" 
-    id="placaInput" 
-    placeholder="Ingrese mínimo 3 letras de la placa"
+  <input
+    id="placaInput"
+    type="text"
+    placeholder="Ingrese placa"
   >
 
   <br>
 
-  <button onclick="buscarVehiculo()">Buscar</button>
+  <button onclick="buscar()">Buscar</button>
 
   <div id="resultado"></div>
 
