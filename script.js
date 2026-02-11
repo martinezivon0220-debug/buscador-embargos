@@ -1,58 +1,86 @@
+// ============================
+// USUARIOS DEL SISTEMA
+// ============================
+const usuarios = [
+  { user: "admin", pass: "1234" },
+  { user: "vanne", pass: "5678" },
+  { user: "consulta1", pass: "abcd" }
+];
+
+// ============================
+// LOGIN
+// ============================
+function login() {
+  const u = document.getElementById("usuario").value;
+  const p = document.getElementById("password").value;
+
+  const valido = usuarios.find(x => x.user === u && x.pass === p);
+
+  if (!valido) {
+    document.getElementById("loginError").innerText =
+      "Usuario o contraseña incorrectos";
+    return;
+  }
+
+  localStorage.setItem("usuarioActivo", u);
+  iniciarApp();
+}
+
+function logout() {
+  localStorage.removeItem("usuarioActivo");
+  location.reload();
+}
+
+function iniciarApp() {
+  document.getElementById("login").style.display = "none";
+  document.getElementById("app").style.display = "block";
+
+  const usuario = localStorage.getItem("usuarioActivo");
+  document.getElementById("usuarioActivo").innerText = usuario;
+}
+
+// ============================
+// SI YA ESTÁ LOGUEADO
+// ============================
+if (localStorage.getItem("usuarioActivo")) {
+  iniciarApp();
+}
+
+// ============================
+// BUSCADOR + CONTADOR
+// ============================
 let placas = [];
+let totalConsultas = 0;
 
 const input = document.getElementById("placaInput");
 const resultadoDiv = document.getElementById("resultado");
-const historialDiv = document.getElementById("historial");
 const contadorDiv = document.getElementById("contador");
+const historialDiv = document.getElementById("historial");
 
-// 🔢 CONTADOR (se guarda aunque cierres la app)
-let totalConsultas = localStorage.getItem("totalConsultas")
-  ? parseInt(localStorage.getItem("totalConsultas"))
-  : 0;
-
-contadorDiv.innerText = `Total de consultas realizadas: ${totalConsultas}`;
-
-// 📂 Cargar CSV
+// Cargar CSV
 fetch("placas.csv")
-  .then(response => response.text())
+  .then(r => r.text())
   .then(data => {
     placas = data
       .split(/\r?\n/)
-      .map(line => line.split(",")[0])
       .map(p => p.trim().toUpperCase())
-      .filter(p => p.length > 0);
-
-    console.log("Placas cargadas:", placas);
+      .filter(p => p);
   });
 
-// 🔎 BÚSQUEDA EN TIEMPO REAL
 input.addEventListener("input", () => {
   const busqueda = input.value.toUpperCase().trim();
-  resultadoDiv.innerHTML = "";
-
   if (busqueda.length === 0) return;
 
-  // ➕ SUMA UNA CONSULTA
   totalConsultas++;
-  localStorage.setItem("totalConsultas", totalConsultas);
-  contadorDiv.innerText = `Total de consultas realizadas: ${totalConsultas}`;
+  contadorDiv.innerText = `Total de consultas: ${totalConsultas}`;
 
-  // 📜 HISTORIAL
-  const item = document.createElement("div");
-  item.textContent = `🔍 ${busqueda}`;
-  historialDiv.prepend(item);
+  const h = document.createElement("div");
+  h.innerText = "🔍 " + busqueda;
+  historialDiv.appendChild(h);
 
-  // 🔍 COINCIDENCIAS
   const coincidencias = placas.filter(p => p.startsWith(busqueda));
 
-  if (coincidencias.length > 0) {
-    resultadoDiv.innerHTML = `
-      <strong>Placas con embargo encontradas:</strong><br><br>
-      ${coincidencias.map(p => `🚗 ${p}`).join("<br>")}
-    `;
-  } else {
-    resultadoDiv.innerHTML = `
-      ❌ No se encontraron placas con embargo
-    `;
-  }
+  resultadoDiv.innerHTML = coincidencias.length
+    ? coincidencias.map(p => "🚗 " + p).join("<br>")
+    : "❌ No se encontraron coincidencias";
 });
