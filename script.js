@@ -2,6 +2,19 @@ let placas = [];
 
 const input = document.getElementById("placaInput");
 const resultadoDiv = document.getElementById("resultado");
+const historialDiv = document.getElementById("historial");
+
+// Cargar historial guardado
+let historial = JSON.parse(localStorage.getItem("historialBusquedas")) || [];
+
+// Mostrar historial
+function mostrarHistorial() {
+  historialDiv.innerHTML = historial
+    .slice(-10)
+    .reverse()
+    .map(h => `🔎 ${h}`)
+    .join("<br>");
+}
 
 // Cargar CSV
 fetch("placas.csv")
@@ -12,19 +25,21 @@ fetch("placas.csv")
       .map(line => line.split(",")[0])
       .map(p => p.trim().toUpperCase())
       .filter(p => p.length > 0);
-
-    console.log("Placas cargadas:", placas);
   });
 
-// 🔍 BUSQUEDA AUTOMÁTICA AL ESCRIBIR
+// Buscar
 input.addEventListener("input", buscar);
 
-// 🔘 FUNCIÓN DEL BOTÓN
 function buscar() {
   const busqueda = input.value.toUpperCase().trim();
   resultadoDiv.innerHTML = "";
 
   if (busqueda.length === 0) return;
+
+  // Guardar historial
+  historial.push(busqueda);
+  localStorage.setItem("historialBusquedas", JSON.stringify(historial));
+  mostrarHistorial();
 
   const coincidencias = placas.filter(p =>
     p.startsWith(busqueda)
@@ -36,8 +51,9 @@ function buscar() {
       ${coincidencias.map(p => `🚗 ${p}`).join("<br>")}
     `;
   } else {
-    resultadoDiv.innerHTML = `
-      ❌ No se encontraron placas con embargo
-    `;
+    resultadoDiv.innerHTML = `❌ No se encontraron placas con embargo`;
   }
 }
+
+// Mostrar historial al cargar
+mostrarHistorial();
