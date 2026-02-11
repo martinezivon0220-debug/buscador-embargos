@@ -2,9 +2,9 @@
 // USUARIOS DEL SISTEMA
 // ============================
 const usuarios = [
-  { user: "admin", pass: "1234" },
-  { user: "vanne", pass: "5678" },
-  { user: "consulta1", pass: "abcd" }
+  { user: "sebasadmin", pass: "3211" },
+  { user: "capturador1", pass: "veh1234" },
+  { user: "capturador2", pass: "veh5678" }
 ];
 
 // ============================
