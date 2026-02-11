@@ -21,11 +21,23 @@ const usuarios = [
 ];
 
 // ============================
+// ELEMENTOS
+// ============================
+const loginDiv = document.getElementById("login");
+const appDiv = document.getElementById("app");
+const usuarioSpan = document.getElementById("usuarioActivo");
+
+const input = document.getElementById("placaInput");
+const resultadoDiv = document.getElementById("resultado");
+const contadorDiv = document.getElementById("contador");
+const historialDiv = document.getElementById("historial");
+
+// ============================
 // LOGIN
 // ============================
 function login() {
-  const u = document.getElementById("usuario").value;
-  const p = document.getElementById("password").value;
+  const u = document.getElementById("usuario").value.trim();
+  const p = document.getElementById("password").value.trim();
 
   const valido = usuarios.find(x => x.user === u && x.pass === p);
 
@@ -39,24 +51,33 @@ function login() {
   iniciarApp();
 }
 
+// ============================
+// LOGOUT (CORREGIDO)
+// ============================
 function logout() {
   localStorage.removeItem("usuarioActivo");
-  location.reload();
-}
-
-function iniciarApp() {
-  document.getElementById("login").style.display = "none";
-  document.getElementById("app").style.display = "block";
-
-  const usuario = localStorage.getItem("usuarioActivo");
-  document.getElementById("usuarioActivo").innerText = usuario;
+  window.location.href = "index.html";
 }
 
 // ============================
-// SI YA ESTÁ LOGUEADO
+// INICIAR APP
+// ============================
+function iniciarApp() {
+  loginDiv.style.display = "none";
+  appDiv.style.display = "block";
+
+  const usuario = localStorage.getItem("usuarioActivo");
+  usuarioSpan.innerText = usuario;
+}
+
+// ============================
+// PROTECCIÓN (NO LOGIN = NO ENTRA)
 // ============================
 if (localStorage.getItem("usuarioActivo")) {
   iniciarApp();
+} else {
+  loginDiv.style.display = "block";
+  appDiv.style.display = "none";
 }
 
 // ============================
@@ -64,11 +85,6 @@ if (localStorage.getItem("usuarioActivo")) {
 // ============================
 let placas = [];
 let totalConsultas = 0;
-
-const input = document.getElementById("placaInput");
-const resultadoDiv = document.getElementById("resultado");
-const contadorDiv = document.getElementById("contador");
-const historialDiv = document.getElementById("historial");
 
 // Cargar CSV
 fetch("placas.csv")
@@ -80,6 +96,7 @@ fetch("placas.csv")
       .filter(p => p);
   });
 
+// Búsqueda en tiempo real
 input.addEventListener("input", () => {
   const busqueda = input.value.toUpperCase().trim();
   if (busqueda.length === 0) return;
@@ -97,5 +114,3 @@ input.addEventListener("input", () => {
     ? coincidencias.map(p => "🚗 " + p).join("<br>")
     : "❌ No se encontraron coincidencias";
 });
-
-
