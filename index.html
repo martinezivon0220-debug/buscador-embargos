@@ -2,67 +2,61 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Buscador de Embargos</title>
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#c51616">
-  <link rel="manifest" href="manifest.json">
+  <title>EMBARGOS VEHÍCOL SAS</title>
 
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f4f4f4;
+      background: #f4f8ff;
       padding: 20px;
+      text-align: center;
     }
 
     h1 {
-      color: #c51616;
+      color: #0a3d91;
     }
 
     input {
       padding: 10px;
+      width: 80%;
+      max-width: 300px;
+      margin-bottom: 10px;
       font-size: 16px;
-      width: 200px;
     }
 
     button {
-      padding: 10px 15px;
+      padding: 10px 20px;
       font-size: 16px;
-      background: #c51616;
+      background: #0a3d91;
       color: white;
       border: none;
-      cursor: pointer;
+      border-radius: 5px;
     }
 
-    .resultado {
+    #resultado {
       margin-top: 20px;
-      background: white;
-      padding: 15px;
-      border-radius: 5px;
+      font-size: 16px;
     }
   </style>
 </head>
 
 <body>
 
-  <h1>Consulta de Vehículos con Embargo</h1>
+  <h1>EMBARGOS VEHÍCOL SAS</h1>
 
-  <input type="text" id="placa" placeholder="Ej: ABC123">
+  <input 
+    type="text" 
+    id="placaInput" 
+    placeholder="Ingrese mínimo 3 letras de la placa"
+  >
+
+  <br>
+
   <button onclick="buscarVehiculo()">Buscar</button>
 
-  <div id="resultado" class="resultado"></div>
+  <div id="resultado"></div>
 
-  <!-- TU SCRIPT PRINCIPAL -->
   <script src="script.js"></script>
-
-  <!-- REGISTRO DEL SERVICE WORKER -->
-  <script>
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("service-worker.js")
-        .then(() => console.log("Service Worker registrado"))
-        .catch(err => console.log("Error SW:", err));
-    }
-  </script>
-
 </body>
 </html>
