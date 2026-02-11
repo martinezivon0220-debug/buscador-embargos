@@ -3,30 +3,24 @@ let placas = [];
 const input = document.getElementById("placaInput");
 const resultadoDiv = document.getElementById("resultado");
 
-// ===============================
-// CARGAR PLACAS DESDE EL CSV
-// (corrige problemas de Excel)
-// ===============================
+// Cargar CSV
 fetch("placas.csv")
   .then(response => response.text())
   .then(data => {
     placas = data
-      .split(/\r?\n/)                 // elimina \r de Excel
-      .map(line => line.split(",")[0]) // solo primera columna
+      .split(/\r?\n/)
+      .map(line => line.split(",")[0])
       .map(p => p.trim().toUpperCase())
       .filter(p => p.length > 0);
 
-    console.log("Placas cargadas:", placas); // debug
-  })
-  .catch(error => {
-    console.error("Error cargando el CSV:", error);
+    console.log("Placas cargadas:", placas);
   });
 
-// ===============================
-// BÚSQUEDA EN TIEMPO REAL
-// (sin botón)
-// ===============================
-input.addEventListener("input", () => {
+// 🔍 BUSQUEDA AUTOMÁTICA AL ESCRIBIR
+input.addEventListener("input", buscar);
+
+// 🔘 FUNCIÓN DEL BOTÓN
+function buscar() {
   const busqueda = input.value.toUpperCase().trim();
   resultadoDiv.innerHTML = "";
 
@@ -38,10 +32,12 @@ input.addEventListener("input", () => {
 
   if (coincidencias.length > 0) {
     resultadoDiv.innerHTML = `
-      <strong>🚨 Placas con embargo encontradas:</strong><br><br>
+      <strong>Placas con embargo encontradas:</strong><br><br>
       ${coincidencias.map(p => `🚗 ${p}`).join("<br>")}
     `;
   } else {
-    resultadoDiv.innerHTML = "❌ No se encontraron placas con embargo";
+    resultadoDiv.innerHTML = `
+      ❌ No se encontraron placas con embargo
+    `;
   }
-});
+}
