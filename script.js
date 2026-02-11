@@ -2,7 +2,7 @@
 // USUARIOS DEL SISTEMA
 // ============================
 const usuarios = [
-  { user: "sebasadmin", pass: "3211" },
+  { user: "admin", pass: "1234" },
   { user: "capturador1", pass: "veh1234" },
   { user: "capturador2", pass: "veh5678" }
 ];
@@ -84,3 +84,4 @@ input.addEventListener("input", () => {
     ? coincidencias.map(p => "🚗 " + p).join("<br>")
     : "❌ No se encontraron coincidencias";
 });
+
