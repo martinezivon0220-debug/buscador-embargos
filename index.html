@@ -2,106 +2,136 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <title>Buscador de Embargos - EMBARGOS VEHÍCOL SAS</title>
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EMBARGOS VEHÍCOL SAS</title>
 
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f4f7fb;
-      text-align: center;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 0;
+    }
+
+    .card {
+      max-width: 520px;
+      margin: 60px auto;
+      background: #fff;
       padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
 
     h1 {
-      color: #0b3c91;
-    }
-
-    .box {
-      max-width: 400px;
-      margin: auto;
-      background: white;
-      padding: 25px;
-      border-radius: 6px;
-      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      text-align: center;
+      color: #0a3d91;
     }
 
     input {
-      width: 90%;
+      width: 100%;
       padding: 12px;
+      margin-top: 10px;
       font-size: 16px;
-      margin: 10px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
     }
 
     button {
-      padding: 12px 25px;
-      background: #0b3c91;
-      color: white;
+      margin-top: 15px;
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
       border: none;
-      border-radius: 5px;
+      border-radius: 6px;
       cursor: pointer;
     }
 
-    #app {
-      display: none;
+    .btn-login {
+      background: #0a3d91;
+      color: #fff;
     }
 
-    #contador {
+    .btn-logout {
+      background: #b30000;
+      color: #fff;
+      margin-top: 25px;
+    }
+
+    .error {
+      color: red;
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    .usuario {
+      text-align: center;
+      margin-bottom: 15px;
+      font-weight: bold;
+    }
+
+    #resultado {
       margin-top: 15px;
       font-weight: bold;
     }
 
-    #historial {
-      text-align: left;
-      margin-top: 20px;
+    #contador {
+      margin-top: 10px;
+      text-align: center;
     }
 
-    .logout {
-      margin-top: 20px;
-      background: #b30000;
+    #historial {
+      margin-top: 15px;
+      font-size: 14px;
+    }
+
+    .ok {
+      color: green;
+    }
+
+    .no {
+      color: red;
     }
   </style>
 </head>
 
 <body>
 
-<!-- LOGIN -->
-<div id="login" class="box">
-  <h1>Ingreso al sistema</h1>
+  <!-- LOGIN -->
+  <div class="card" id="login">
+    <h1>Ingreso al sistema</h1>
 
-  <input type="text" id="usuario" placeholder="Usuario">
-  <input type="password" id="password" placeholder="Contraseña">
+    <input id="usuario" placeholder="Usuario">
+    <input id="password" type="password" placeholder="Contraseña">
 
-  <br>
-  <button onclick="login()">Ingresar</button>
+    <button class="btn-login" onclick="login()">Ingresar</button>
 
-  <p id="loginError" style="color:red;"></p>
-</div>
-
-<!-- APP -->
-<div id="app" class="box">
-  <h1>EMBARGOS VEHÍCOL SAS</h1>
-
-  <p>👤 Usuario: <strong id="usuarioActivo"></strong></p>
-
-  <input
-    type="text"
-    id="placaInput"
-    placeholder="Digite placa"
-    autocomplete="off"
-  >
-
-  <div id="resultado"></div>
-
-  <div id="contador">Total de consultas: 0</div>
-
-  <div id="historial">
-    <h3>Historial</h3>
+    <div class="error" id="loginError"></div>
   </div>
 
-  <button class="logout" onclick="logout()">Cerrar sesión</button>
-</div>
+  <!-- APP -->
+  <div class="card" id="app" style="display:none;">
+    <h1>EMBARGOS VEHÍCOL SAS</h1>
 
-<script src="script.js"></script>
+    <div class="usuario">
+      👤 Usuario: <span id="usuarioActivo"></span>
+    </div>
+
+    <input id="placaInput" placeholder="Digite placa">
+
+    <div id="resultado"></div>
+
+    <div id="contador">Total de consultas: 0</div>
+
+    <h3>Historial</h3>
+    <div id="historial"></div>
+
+    <button class="btn-logout" onclick="logout()">Cerrar sesión</button>
+  </div>
+
+  <!-- SCRIPT -->
+  <!-- IMPORTANTE: versionado para evitar caché -->
+  <script src="script.js?v=5"></script>
+
 </body>
 </html>
