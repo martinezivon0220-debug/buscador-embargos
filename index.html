@@ -1,51 +1,46 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Buscador de Embargos - EMBARGOS VEHÍCOL SAS</title>
 
   <style>
     body {
       font-family: Arial, sans-serif;
       background-color: #f4f7fb;
-      margin: 0;
-      padding: 0;
       text-align: center;
+      padding: 30px;
     }
 
     h1 {
       color: #0b3c91;
-      margin-top: 40px;
-    }
-
-    .container {
-      margin-top: 30px;
+      margin-bottom: 30px;
     }
 
     input {
-      width: 80%;
+      width: 90%;
       max-width: 400px;
-      padding: 14px;
+      padding: 12px;
       font-size: 18px;
       border: 2px solid #0b3c91;
-      border-radius: 6px;
-      outline: none;
+      border-radius: 5px;
+      text-transform: uppercase;
     }
 
     button {
-      margin-top: 20px;
-      padding: 12px 30px;
+      margin-top: 15px;
+      padding: 12px 25px;
       font-size: 16px;
       background-color: #0b3c91;
       color: white;
       border: none;
-      border-radius: 6px;
+      border-radius: 5px;
       cursor: pointer;
     }
 
     button:hover {
-      background-color: #082c6a;
+      background-color: #062b6f;
     }
 
     #resultado {
@@ -53,18 +48,33 @@
       font-size: 16px;
     }
 
+    #contador {
+      margin-top: 20px;
+      font-weight: bold;
+      color: #0b3c91;
+    }
+
     #historial {
-      margin-top: 15px;
-      font-size: 14px;
-      color: #333;
+      margin-top: 30px;
       text-align: left;
       max-width: 400px;
       margin-left: auto;
       margin-right: auto;
+      background: white;
+      padding: 15px;
+      border-radius: 5px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
     }
 
-    hr {
-      max-width: 400px;
+    #historial h3 {
+      margin-top: 0;
+      color: #0b3c91;
+    }
+
+    #historial div {
+      font-size: 14px;
+      border-bottom: 1px solid #eee;
+      padding: 4px 0;
     }
   </style>
 </head>
@@ -73,29 +83,29 @@
 
   <h1>EMBARGOS VEHÍCOL SAS</h1>
 
-  <div class="container">
-    <!-- INPUT PRINCIPAL -->
-    <input
-      type="text"
-      id="placaInput"
-      placeholder="Ingrese placa (ej: ABC)"
-      autocomplete="off"
-    />
+  <input
+    type="text"
+    id="placaInput"
+    placeholder="Digite las primeras letras de la placa"
+    autocomplete="off"
+  >
 
-    <!-- BOTÓN (opcional, la búsqueda ya es automática) -->
-    <br />
-    <button onclick="buscar()">Buscar</button>
+  <!-- El botón ya no es obligatorio, pero lo dejamos -->
+  <br>
+  <button onclick="document.getElementById('placaInput').dispatchEvent(new Event('input'))">
+    Buscar
+  </button>
 
-    <!-- RESULTADO -->
-    <div id="resultado"></div>
+  <div id="resultado"></div>
 
-    <!-- HISTORIAL -->
-    <hr />
-    <h3>Historial de búsquedas</h3>
-    <div id="historial"></div>
+  <div id="contador">
+    Total de consultas realizadas: 0
   </div>
 
-  <!-- SCRIPT -->
+  <div id="historial">
+    <h3>Historial de búsquedas</h3>
+  </div>
+
   <script src="script.js"></script>
 
 </body>
