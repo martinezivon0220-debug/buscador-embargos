@@ -7,30 +7,8 @@ const usuarios = [
   { user: "capturador2", pass: "veh5678" },
   { user: "capturador3", pass: "veh5678" },
   { user: "capturador4", pass: "veh5678" },
-  { user: "capturador5", pass: "veh5678" },
-  { user: "capturador6", pass: "veh5678" },
-  { user: "capturador7", pass: "veh5678" },
-  { user: "capturador8", pass: "veh5678" },
-  { user: "capturador9", pass: "veh5678" },
-  { user: "capturador10", pass: "veh5678" },
-  { user: "capturador11", pass: "veh5678" },
-  { user: "capturador12", pass: "veh5678" },
-  { user: "capturador13", pass: "veh5678" },
-  { user: "capturador14", pass: "veh5678" },
-  { user: "capturador15", pass: "veh5678" }
+  { user: "capturador5", pass: "veh5678" }
 ];
-
-// ============================
-// ELEMENTOS
-// ============================
-const loginDiv = document.getElementById("login");
-const appDiv = document.getElementById("app");
-const usuarioSpan = document.getElementById("usuarioActivo");
-
-const input = document.getElementById("placaInput");
-const resultadoDiv = document.getElementById("resultado");
-const contadorDiv = document.getElementById("contador");
-const historialDiv = document.getElementById("historial");
 
 // ============================
 // LOGIN
@@ -51,66 +29,77 @@ function login() {
   iniciarApp();
 }
 
-// ============================
-// LOGOUT (CORREGIDO)
-// ============================
 function logout() {
   localStorage.removeItem("usuarioActivo");
-  window.location.href = "index.html";
+  location.reload();
 }
 
-// ============================
-// INICIAR APP
-// ============================
 function iniciarApp() {
-  loginDiv.style.display = "none";
-  appDiv.style.display = "block";
+  document.getElementById("login").style.display = "none";
+  document.getElementById("app").style.display = "block";
 
-  const usuario = localStorage.getItem("usuarioActivo");
-  usuarioSpan.innerText = usuario;
+  document.getElementById("usuarioActivo").innerText =
+    localStorage.getItem("usuarioActivo");
 }
 
-// ============================
-// PROTECCIÓN (NO LOGIN = NO ENTRA)
-// ============================
+// Auto-login
 if (localStorage.getItem("usuarioActivo")) {
   iniciarApp();
-} else {
-  loginDiv.style.display = "block";
-  appDiv.style.display = "none";
 }
 
 // ============================
-// BUSCADOR + CONTADOR
+// BUSCADOR
 // ============================
 let placas = [];
 let totalConsultas = 0;
 
-// Cargar CSV
+const input = document.getElementById("placaInput");
+const resultadoDiv = document.getElementById("resultado");
+const contadorDiv = document.getElementById("contador");
+const historialDiv = document.getElementById("historial");
+
+// ============================
+// CARGAR CSV (FIX EXCEL DEFINITIVO)
+// ============================
 fetch("placas.csv")
   .then(r => r.text())
-  .then(data => {
-    placas = data
-      .split(/\r?\n/)
-      .map(p => p.trim().toUpperCase())
-      .filter(p => p);
+  .then(texto => {
+    placas = texto
+      .replace(/\uFEFF/g, "")              // elimina BOM
+      .split(/\r?\n/)                      // líneas
+      .map(l => l.split(/[;,]/)[0])        // toma solo 1ra columna
+      .map(p => p.trim().toUpperCase())    // limpia
+      .filter(p => p.length > 0);
+
+    console.log("PLACAS CARGADAS:", placas.slice(0, 10));
   });
 
-// Búsqueda en tiempo real
+// ============================
+// BÚSQUEDA EN TIEMPO REAL
+// ============================
 input.addEventListener("input", () => {
   const busqueda = input.value.toUpperCase().trim();
+  resultadoDiv.innerHTML = "";
+
   if (busqueda.length === 0) return;
 
   totalConsultas++;
   contadorDiv.innerText = `Total de consultas: ${totalConsultas}`;
 
+  // Historial
   const h = document.createElement("div");
-  h.innerText = "🔍 " + busqueda;
+  h.innerText = "🔎 " + busqueda;
   historialDiv.appendChild(h);
 
+  // Coincidencias
   const coincidencias = placas.filter(p => p.startsWith(busqueda));
 
-  resultadoDiv.innerHTML = coincidencias.length
-    ? coincidencias.map(p => "🚗 " + p).join("<br>")
-    : "❌ No se encontraron coincidencias";
+  if (coincidencias.length > 0) {
+    resultadoDiv.innerHTML =
+      `<span style="color:green;">✔ Coincidencias encontradas:</span><br><br>` +
+      coincidencias.map(p => `🚗 ${p}`).join("<br>");
+  } else {
+    resultadoDiv.innerHTML =
+      `<span style="color:red;">❌ No se encontraron coincidencias</span>`;
+  }
 });
