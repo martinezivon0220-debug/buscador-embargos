@@ -1,43 +1,70 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Buscador de Embargos - EMBARGOS VEHÍCOL SAS</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f4f7fb;
+      background-color: #f4f7fb;
+      margin: 0;
+      padding: 0;
       text-align: center;
-      padding-top: 60px;
     }
 
     h1 {
       color: #0b3c91;
+      margin-top: 40px;
+    }
+
+    .container {
+      margin-top: 30px;
     }
 
     input {
-      width: 300px;
-      padding: 12px;
+      width: 80%;
+      max-width: 400px;
+      padding: 14px;
       font-size: 18px;
-      text-transform: uppercase;
+      border: 2px solid #0b3c91;
+      border-radius: 6px;
+      outline: none;
     }
 
     button {
-      margin-top: 15px;
-      padding: 10px 25px;
+      margin-top: 20px;
+      padding: 12px 30px;
       font-size: 16px;
-      background: #0b3c91;
+      background-color: #0b3c91;
       color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 6px;
       cursor: pointer;
     }
 
+    button:hover {
+      background-color: #082c6a;
+    }
+
     #resultado {
-      margin-top: 30px;
+      margin-top: 25px;
       font-size: 16px;
+    }
+
+    #historial {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #333;
+      text-align: left;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    hr {
+      max-width: 400px;
     }
   </style>
 </head>
@@ -46,18 +73,30 @@
 
   <h1>EMBARGOS VEHÍCOL SAS</h1>
 
-  <input
-    id="placaInput"
-    type="text"
-    placeholder="Ingrese placa"
-  >
+  <div class="container">
+    <!-- INPUT PRINCIPAL -->
+    <input
+      type="text"
+      id="placaInput"
+      placeholder="Ingrese placa (ej: ABC)"
+      autocomplete="off"
+    />
 
-  <br>
+    <!-- BOTÓN (opcional, la búsqueda ya es automática) -->
+    <br />
+    <button onclick="buscar()">Buscar</button>
 
-  <button onclick="buscar()">Buscar</button>
+    <!-- RESULTADO -->
+    <div id="resultado"></div>
 
-  <div id="resultado"></div>
+    <!-- HISTORIAL -->
+    <hr />
+    <h3>Historial de búsquedas</h3>
+    <div id="historial"></div>
+  </div>
 
+  <!-- SCRIPT -->
   <script src="script.js"></script>
+
 </body>
 </html>
