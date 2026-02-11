@@ -2,9 +2,22 @@
 // USUARIOS DEL SISTEMA
 // ============================
 const usuarios = [
-  { user: "admin", pass: "1234" },
-  { user: "capturador1", pass: "veh1234" },
-  { user: "capturador2", pass: "veh5678" }
+  { user: "Admin", pass: "1234" },
+  { user: "capturador1", pass: "veh5678" },
+  { user: "capturador2", pass: "veh5678" },
+  { user: "capturador3", pass: "veh5678" },
+  { user: "capturador4", pass: "veh5678" },
+  { user: "capturador5", pass: "veh5678" },
+  { user: "capturador6", pass: "veh5678" },
+  { user: "capturador7", pass: "veh5678" },
+  { user: "capturador8", pass: "veh5678" },
+  { user: "capturador9", pass: "veh5678" },
+  { user: "capturador10", pass: "veh5678" },
+  { user: "capturador11", pass: "veh5678" },
+  { user: "capturador12", pass: "veh5678" },
+  { user: "capturador13", pass: "veh5678" },
+  { user: "capturador14", pass: "veh5678" },
+  { user: "capturador15", pass: "veh5678" }
 ];
 
 // ============================
@@ -84,4 +97,5 @@ input.addEventListener("input", () => {
     ? coincidencias.map(p => "🚗 " + p).join("<br>")
     : "❌ No se encontraron coincidencias";
 });
+
 
