@@ -3,20 +3,16 @@ let placas = [];
 const input = document.getElementById("placaInput");
 const resultadoDiv = document.getElementById("resultado");
 const historialDiv = document.getElementById("historial");
+const contadorDiv = document.getElementById("contador");
 
-// Cargar historial guardado
-let historial = JSON.parse(localStorage.getItem("historialBusquedas")) || [];
+// 🔢 CONTADOR (se guarda aunque cierres la app)
+let totalConsultas = localStorage.getItem("totalConsultas")
+  ? parseInt(localStorage.getItem("totalConsultas"))
+  : 0;
 
-// Mostrar historial
-function mostrarHistorial() {
-  historialDiv.innerHTML = historial
-    .slice(-10)
-    .reverse()
-    .map(h => `🔎 ${h}`)
-    .join("<br>");
-}
+contadorDiv.innerText = `Total de consultas realizadas: ${totalConsultas}`;
 
-// Cargar CSV
+// 📂 Cargar CSV
 fetch("placas.csv")
   .then(response => response.text())
   .then(data => {
@@ -25,25 +21,29 @@ fetch("placas.csv")
       .map(line => line.split(",")[0])
       .map(p => p.trim().toUpperCase())
       .filter(p => p.length > 0);
+
+    console.log("Placas cargadas:", placas);
   });
 
-// Buscar
-input.addEventListener("input", buscar);
-
-function buscar() {
+// 🔎 BÚSQUEDA EN TIEMPO REAL
+input.addEventListener("input", () => {
   const busqueda = input.value.toUpperCase().trim();
   resultadoDiv.innerHTML = "";
 
   if (busqueda.length === 0) return;
 
-  // Guardar historial
-  historial.push(busqueda);
-  localStorage.setItem("historialBusquedas", JSON.stringify(historial));
-  mostrarHistorial();
+  // ➕ SUMA UNA CONSULTA
+  totalConsultas++;
+  localStorage.setItem("totalConsultas", totalConsultas);
+  contadorDiv.innerText = `Total de consultas realizadas: ${totalConsultas}`;
 
-  const coincidencias = placas.filter(p =>
-    p.startsWith(busqueda)
-  );
+  // 📜 HISTORIAL
+  const item = document.createElement("div");
+  item.textContent = `🔍 ${busqueda}`;
+  historialDiv.prepend(item);
+
+  // 🔍 COINCIDENCIAS
+  const coincidencias = placas.filter(p => p.startsWith(busqueda));
 
   if (coincidencias.length > 0) {
     resultadoDiv.innerHTML = `
@@ -51,9 +51,8 @@ function buscar() {
       ${coincidencias.map(p => `🚗 ${p}`).join("<br>")}
     `;
   } else {
-    resultadoDiv.innerHTML = `❌ No se encontraron placas con embargo`;
+    resultadoDiv.innerHTML = `
+      ❌ No se encontraron placas con embargo
+    `;
   }
-}
-
-// Mostrar historial al cargar
-mostrarHistorial();
+});
