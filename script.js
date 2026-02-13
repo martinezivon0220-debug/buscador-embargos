@@ -19,8 +19,8 @@ const usuarios = [
 // LOGIN
 // ============================
 function login() {
-  const u = document.getElementById("usuario").value;
-  const p = document.getElementById("password").value;
+  const u = document.getElementById("usuario").value.trim();
+  const p = document.getElementById("password").value.trim();
 
   const valido = usuarios.find(x => x.user === u && x.pass === p);
 
@@ -43,17 +43,19 @@ function iniciarApp() {
   document.getElementById("login").style.display = "none";
   document.getElementById("app").style.display = "block";
 
-  document.getElementById("usuarioActivo").innerText =
-    localStorage.getItem("usuarioActivo");
+  const usuario = localStorage.getItem("usuarioActivo");
+  document.getElementById("usuarioActivo").innerText = usuario;
 }
 
-// Auto login
+// ============================
+// SI YA ESTÁ LOGUEADO
+// ============================
 if (localStorage.getItem("usuarioActivo")) {
   iniciarApp();
 }
 
 // ============================
-// BUSCADOR + CONTADOR
+// BUSCADOR + CONTADOR (SIN HISTORIAL)
 // ============================
 let placas = [];
 let totalConsultas = 0;
@@ -61,29 +63,21 @@ let totalConsultas = 0;
 const input = document.getElementById("placaInput");
 const resultadoDiv = document.getElementById("resultado");
 const contadorDiv = document.getElementById("contador");
-const historialDiv = document.getElementById("historial");
 
-// ============================
-// CARGA DEL CSV (FIX REAL)
-// ============================
+// Cargar CSV
 fetch("placas.csv")
   .then(r => r.text())
   .then(data => {
     placas = data
-      .replace(/\uFEFF/g, "")        // quita BOM de Excel
-      .split(/\r?\n/)                // separa filas
-      .map(l => l.split(/[;,]/)[0])  // toma solo la primera columna
+      .split(/\r?\n/)
       .map(p => p.trim().toUpperCase())
-      .filter(p => p !== "");
-
-    console.log("Placas cargadas:", placas);
+      .filter(p => p);
   });
 
-// ============================
-// BÚSQUEDA EN TIEMPO REAL
-// ============================
+// Búsqueda en tiempo real
 input.addEventListener("input", () => {
   const busqueda = input.value.toUpperCase().trim();
+
   resultadoDiv.innerHTML = "";
 
   if (busqueda.length === 0) return;
@@ -91,20 +85,13 @@ input.addEventListener("input", () => {
   totalConsultas++;
   contadorDiv.innerText = `Total de consultas: ${totalConsultas}`;
 
-  const h = document.createElement("div");
-  h.innerText = "🔍 " + busqueda;
-  historialDiv.appendChild(h);
-
-  const coincidencias = placas.filter(p =>
-    p.startsWith(busqueda)
-  );
+  const coincidencias = placas.filter(p => p.startsWith(busqueda));
 
   if (coincidencias.length > 0) {
-    resultadoDiv.innerHTML =
-      `<strong>Placas encontradas:</strong><br><br>` +
-      coincidencias.map(p => `🚗 ${p}`).join("<br>");
+    resultadoDiv.innerHTML = coincidencias
+      .map(p => `🚗 ${p}`)
+      .join("<br>");
   } else {
-    resultadoDiv.innerHTML =
-      "❌ No se encontraron coincidencias";
+    resultadoDiv.innerHTML = "❌ No se encontraron coincidencias";
   }
 });
