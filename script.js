@@ -74,29 +74,18 @@ const input = document.getElementById("placaInput");
 const resultadoDiv = document.getElementById("resultado");
 const contadorDiv = document.getElementById("contador");
 
-// ============================
-// CARGAR PLACAS DESDE GOOGLE SHEETS (ANTI CACHÉ)
-// ============================
-fetch(
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRMWEEX2PpU_0lKDoQEhfpug6z4lr3tflwb2fVE51zZyWIu6nR17G3Z0g3Y9MCmEolZ2LDjB884_Cep/pub?gid=0&single=true&output=csv&t=" 
-  + new Date().getTime()
-)
+// Cargar CSV
+fetch("placas.csv")
   .then(r => r.text())
   .then(data => {
     placas = data
       .split(/\r?\n/)
+      .map(line => line.split(",")[0])
       .map(p => p.trim().toUpperCase())
-      .filter(p => p.length > 0);
-
-    console.log("Placas cargadas:", placas.length);
-  })
-  .catch(err => {
-    console.error("Error cargando CSV:", err);
+      .filter(p => p);
   });
 
-// ============================
-// BÚSQUEDA EN TIEMPO REAL
-// ============================
+// Búsqueda en tiempo real
 input.addEventListener("input", () => {
   const busqueda = input.value.toUpperCase().trim();
   resultadoDiv.innerHTML = "";
