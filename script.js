@@ -31,12 +31,6 @@ function login() {
   }
 
   localStorage.setItem("usuarioActivo", u);
-
-  // Inicializar contador si no existe
-  const stats = JSON.parse(localStorage.getItem("consultas")) || {};
-  if (!stats[u]) stats[u] = 0;
-  localStorage.setItem("consultas", JSON.stringify(stats));
-
   iniciarApp();
 }
 
@@ -51,96 +45,66 @@ function iniciarApp() {
 
   const usuario = localStorage.getItem("usuarioActivo");
   document.getElementById("usuarioActivo").innerText = usuario;
-
-  // Mostrar panel admin solo al Admin
-  if (usuario === "Admin") {
-    mostrarEstadisticasAdmin();
-  }
 }
 
-// ============================
-// AUTO LOGIN
-// ============================
+// Si ya está logueado
 if (localStorage.getItem("usuarioActivo")) {
   iniciarApp();
 }
 
 // ============================
-// BUSCADOR
+// BUSCADOR + CONTADOR
 // ============================
 let placas = [];
+let totalConsultas = Number(localStorage.getItem("totalConsultas")) || 0;
 
 const input = document.getElementById("placaInput");
 const resultadoDiv = document.getElementById("resultado");
 const contadorDiv = document.getElementById("contador");
 
-// Cargar CSV
-fetch("https://docs.google.com/spreadsheets/d/1jaO5h7ToObK5ckPCPcgrLihHyiKILdTeR9ebKAZbLkk/edit?gid=0#gid=0")
+contadorDiv.innerText = `Total de consultas: ${totalConsultas}`;
+
+// ============================
+// CARGAR PLACAS DESDE GOOGLE SHEETS (ANTI CACHÉ)
+// ============================
+fetch(
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRMWEEX2PpU_0lKDoQEhfpug6z4lr3tflwb2fVE51zZyWIu6nR17G3Z0g3Y9MCmEolZ2LDjB884_Cep/pub?gid=0&single=true&output=csv&t=" 
+  + new Date().getTime()
+)
   .then(r => r.text())
   .then(data => {
     placas = data
       .split(/\r?\n/)
-      .map(line => line.split(",")[0])
       .map(p => p.trim().toUpperCase())
-      .filter(p => p);
+      .filter(p => p.length > 0);
+
+    console.log("Placas cargadas:", placas.length);
+  })
+  .catch(err => {
+    console.error("Error cargando CSV:", err);
   });
 
-// Búsqueda en tiempo real
+// ============================
+// BÚSQUEDA EN TIEMPO REAL
+// ============================
 input.addEventListener("input", () => {
   const busqueda = input.value.toUpperCase().trim();
   resultadoDiv.innerHTML = "";
 
   if (busqueda.length === 0) return;
 
-  // ===== CONTADOR GLOBAL POR USUARIO =====
-  const usuario = localStorage.getItem("usuarioActivo");
-  const stats = JSON.parse(localStorage.getItem("consultas")) || {};
-  stats[usuario] = (stats[usuario] || 0) + 1;
-  localStorage.setItem("consultas", JSON.stringify(stats));
-
-  contadorDiv.innerText = `Tus consultas: ${stats[usuario]}`;
+  totalConsultas++;
+  localStorage.setItem("totalConsultas", totalConsultas);
+  contadorDiv.innerText = `Total de consultas: ${totalConsultas}`;
 
   const coincidencias = placas.filter(p => p.startsWith(busqueda));
 
   if (coincidencias.length > 0) {
-    resultadoDiv.innerHTML = coincidencias.map(p => `🚗 ${p}`).join("<br>");
+    resultadoDiv.innerHTML =
+      "<span style='color:green'>🚗 Placas encontradas:</span><br><br>" +
+      coincidencias.map(p => "🚗 " + p).join("<br>");
   } else {
-    resultadoDiv.innerHTML = "❌ No se encontraron coincidencias";
-  }
-
-  // Si es Admin, refresca panel
-  if (usuario === "Admin") {
-    mostrarEstadisticasAdmin();
+    resultadoDiv.innerHTML =
+      "<span style='color:red'>❌ No se encontraron coincidencias</span>";
   }
 });
-
-// ============================
-// PANEL ADMIN
-// ============================
-function mostrarEstadisticasAdmin() {
-  let panel = document.getElementById("panelAdmin");
-
-  if (!panel) {
-    panel = document.createElement("div");
-    panel.id = "panelAdmin";
-    panel.style.marginTop = "20px";
-    panel.style.padding = "10px";
-    panel.style.borderTop = "1px solid #ccc";
-    document.getElementById("app").appendChild(panel);
-  }
-
-  const stats = JSON.parse(localStorage.getItem("consultas")) || {};
-  let totalGeneral = 0;
-
-  let html = "<h3>📊 Estadísticas (Admin)</h3>";
-
-  for (const u in stats) {
-    html += `<div>👤 ${u}: <strong>${stats[u]}</strong></div>`;
-    totalGeneral += stats[u];
-  }
-
-  html += `<hr><div><strong>Total general: ${totalGeneral}</strong></div>`;
-
-  panel.innerHTML = html;
-}
-
