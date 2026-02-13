@@ -1,5 +1,5 @@
 // ============================
-// USUARIOS
+// USUARIOS DEL SISTEMA
 // ============================
 const usuarios = [
   { user: "Admin", pass: "1234" },
@@ -13,129 +13,94 @@ const usuarios = [
   { user: "capturador8", pass: "veh5678" },
   { user: "capturador9", pass: "veh5678" },
   { user: "capturador10", pass: "veh5678" }
-// ============================
-// LOGIN
-// ============================
-function login() {
-  const u = document.getElementById("usuario").value.trim();
-  const p = document.getElementById("password").value.trim();
-
-  const valido = usuarios.find(x => x.user === u && x.pass === p);
-  if (!valido) {
-    document.getElementById("loginError").innerText =
-      "Usuario o contraseña incorrectos";
-    return;
-  }
-
-  localStorage.setItem("usuarioActivo", u);
-  iniciarApp();
-}
-
-function logout() {
-  localStorage.removeItem("usuarioActivo");
-  location.reload();
-}
-
-function iniciarApp() {
-  document.getElementById("login").style.display = "none";
-  document.getElementById("app").style.display = "block";
-
-  const usuario = localStorage.getItem("usuarioActivo");
-  document.getElementById("usuarioActivo").innerText = usuario;
-
-  actualizarContador();
-}
-
-// Auto login
-if (localStorage.getItem("usuarioActivo")) iniciarApp();
+];
 
 // ============================
-// VARIABLES
+// VARIABLES GLOBALES
 // ============================
 let placas = [];
-
-const input = document.getElementById("placaInput");
-const resultadoDiv = document.getElementById("resultado");
-const contadorDiv = document.getElementById("contador");
+let totalConsultas = 0;
 
 // ============================
-// CARGAR CSV DESDE GOOGLE SHEETS (ANTI CACHÉ)
+// ESPERAR A QUE CARGUE EL HTML
 // ============================
-fetch(
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRMWEEX2PpU_0lKDoQEhfpug6z4lr3tflwb2fVE51zZyWIu6nR17G3Z0g3Y9MCmEolZ2LDjB884_Cep/pub?gid=0&single=true&output=csv&t=" +
-    new Date().getTime()
-)
-  .then(r => r.text())
-  .then(data => {
-    placas = data
-      .split(/\r?\n/)
-      .map(p =>
-        p
-          .replace(/"/g, "")
-          .replace(/,/g, "")
-          .trim()
-          .toUpperCase()
-      )
-      .filter(p => p.length > 0);
+document.addEventListener("DOMContentLoaded", () => {
 
-    console.log("Placas cargadas:", placas.length);
-  })
-  .catch(err => console.error("Error CSV:", err));
+  // --------- LOGIN ----------
+  window.login = function () {
+    const u = document.getElementById("usuario").value.trim();
+    const p = document.getElementById("password").value.trim();
+    const error = document.getElementById("loginError");
 
-// ============================
-// CONTADORES
-// ============================
-function getStats() {
-  return JSON.parse(localStorage.getItem("stats")) || {};
-}
+    const valido = usuarios.find(x => x.user === u && x.pass === p);
 
-function saveStats(stats) {
-  localStorage.setItem("stats", JSON.stringify(stats));
-}
+    if (!valido) {
+      error.innerText = "Usuario o contraseña incorrectos";
+      return;
+    }
 
-function sumarConsulta() {
-  const usuario = localStorage.getItem("usuarioActivo");
-  let stats = getStats();
+    localStorage.setItem("usuarioActivo", u);
+    iniciarApp();
+  };
 
-  if (!stats[usuario]) stats[usuario] = 0;
-  stats[usuario]++;
+  window.logout = function () {
+    localStorage.removeItem("usuarioActivo");
+    location.reload();
+  };
 
-  saveStats(stats);
-  actualizarContador();
-}
+  function iniciarApp() {
+    document.getElementById("login").style.display = "none";
+    document.getElementById("app").style.display = "block";
 
-function actualizarContador() {
-  const usuario = localStorage.getItem("usuarioActivo");
-  const stats = getStats();
-
-  if (usuario === "Admin") {
-    const total = Object.values(stats).reduce((a, b) => a + b, 0);
-    contadorDiv.innerText = `Total general de consultas: ${total}`;
-  } else {
-    contadorDiv.innerText =
-      `Total de consultas: ${stats[usuario] || 0}`;
+    const usuario = localStorage.getItem("usuarioActivo");
+    document.getElementById("usuarioActivo").innerText = usuario;
   }
-}
 
-// ============================
-// BUSCADOR
-// ============================
-input.addEventListener("input", () => {
-  const busqueda = input.value.trim().toUpperCase();
-  resultadoDiv.innerHTML = "";
-
-  if (!busqueda) return;
-
-  sumarConsulta();
-
-  const existe = placas.includes(busqueda);
-
-  if (existe) {
-    resultadoDiv.innerHTML =
-      "<span style='color:green'>✅ Placa CON embargo</span>";
-  } else {
-    resultadoDiv.innerHTML =
-      "<span style='color:red'>❌ No se encontraron coincidencias</span>";
+  // Si ya hay sesión
+  if (localStorage.getItem("usuarioActivo")) {
+    iniciarApp();
   }
+
+  // --------- BUSCADOR ----------
+  const input = document.getElementById("placaInput");
+  const resultadoDiv = document.getElementById("resultado");
+  const contadorDiv = document.getElementById("contador");
+
+  // Cargar placas desde Google Sheets (CSV público)
+  fetch("https://docs.google.com/spreadsheets/d/e/2PACX-1vRMWEEX2PpU_0lKDoQEhfpug6z4lr3tflwb2fVE51zZyWIu6nR17G3Z0g3Y9MCmEolZ2LDjB884_Cep/pub?gid=0&single=true&output=csv")
+    .then(r => r.text())
+    .then(data => {
+      placas = data
+        .split(/\r?\n/)
+        .map(p => p.trim().toUpperCase())
+        .filter(p => p.length > 0);
+
+      console.log("Placas cargadas:", placas.length);
+    })
+    .catch(err => {
+      console.error("Error cargando CSV", err);
+    });
+
+  input.addEventListener("input", () => {
+    const busqueda = input.value.toUpperCase().trim();
+    if (busqueda.length === 0) {
+      resultadoDiv.innerHTML = "";
+      return;
+    }
+
+    totalConsultas++;
+    contadorDiv.innerText = `Total de consultas: ${totalConsultas}`;
+
+    const coincidencias = placas.filter(p => p.startsWith(busqueda));
+
+    if (coincidencias.length > 0) {
+      resultadoDiv.innerHTML = coincidencias
+        .map(p => `<div class="ok">🚗 ${p}</div>`)
+        .join("");
+    } else {
+      resultadoDiv.innerHTML =
+        `<div class="no">❌ No se encontraron coincidencias</div>`;
+    }
+  });
+
 });
-
