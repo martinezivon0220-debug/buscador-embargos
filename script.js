@@ -43,12 +43,12 @@ function iniciarApp() {
   document.getElementById("login").style.display = "none";
   document.getElementById("app").style.display = "block";
 
-  const usuario = localStorage.getItem("usuarioActivo");
-  document.getElementById("usuarioActivo").innerText = usuario;
+  document.getElementById("usuarioActivo").innerText =
+    localStorage.getItem("usuarioActivo");
 }
 
 // ============================
-// SI YA ESTÁ LOGUEADO
+// AUTO LOGIN
 // ============================
 if (localStorage.getItem("usuarioActivo")) {
   iniciarApp();
@@ -64,17 +64,20 @@ const input = document.getElementById("placaInput");
 const resultadoDiv = document.getElementById("resultado");
 const contadorDiv = document.getElementById("contador");
 
-// Cargar CSV
+// ---- CARGAR CSV (LIMPIO PARA EXCEL) ----
 fetch("placas.csv")
-  .then(r => r.text())
+  .then(res => res.text())
   .then(data => {
     placas = data
       .split(/\r?\n/)
+      .map(line => line.split(",")[0]) // SOLO primera columna
       .map(p => p.trim().toUpperCase())
-      .filter(p => p);
+      .filter(p => p.length > 0);
+
+    console.log("Placas cargadas:", placas); // debug
   });
 
-// Búsqueda en tiempo real
+// ---- BÚSQUEDA EN TIEMPO REAL ----
 input.addEventListener("input", () => {
   const busqueda = input.value.toUpperCase().trim();
 
@@ -82,10 +85,13 @@ input.addEventListener("input", () => {
 
   if (busqueda.length === 0) return;
 
+  const coincidencias = placas.filter(p =>
+    p.startsWith(busqueda)
+  );
+
+  // 👉 Contar SOLO cuando hay intento real
   totalConsultas++;
   contadorDiv.innerText = `Total de consultas: ${totalConsultas}`;
-
-  const coincidencias = placas.filter(p => p.startsWith(busqueda));
 
   if (coincidencias.length > 0) {
     resultadoDiv.innerHTML = coincidencias
