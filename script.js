@@ -31,6 +31,12 @@ function login() {
   }
 
   localStorage.setItem("usuarioActivo", u);
+
+  // Inicializar contador si no existe
+  const stats = JSON.parse(localStorage.getItem("consultas")) || {};
+  if (!stats[u]) stats[u] = 0;
+  localStorage.setItem("consultas", JSON.stringify(stats));
+
   iniciarApp();
 }
 
@@ -43,8 +49,13 @@ function iniciarApp() {
   document.getElementById("login").style.display = "none";
   document.getElementById("app").style.display = "block";
 
-  document.getElementById("usuarioActivo").innerText =
-    localStorage.getItem("usuarioActivo");
+  const usuario = localStorage.getItem("usuarioActivo");
+  document.getElementById("usuarioActivo").innerText = usuario;
+
+  // Mostrar panel admin solo al Admin
+  if (usuario === "Admin") {
+    mostrarEstadisticasAdmin();
+  }
 }
 
 // ============================
@@ -55,49 +66,80 @@ if (localStorage.getItem("usuarioActivo")) {
 }
 
 // ============================
-// BUSCADOR + CONTADOR (SIN HISTORIAL)
+// BUSCADOR
 // ============================
 let placas = [];
-let totalConsultas = 0;
 
 const input = document.getElementById("placaInput");
 const resultadoDiv = document.getElementById("resultado");
 const contadorDiv = document.getElementById("contador");
 
-// ---- CARGAR CSV (LIMPIO PARA EXCEL) ----
+// Cargar CSV
 fetch("placas.csv")
-  .then(res => res.text())
+  .then(r => r.text())
   .then(data => {
     placas = data
       .split(/\r?\n/)
-      .map(line => line.split(",")[0]) // SOLO primera columna
+      .map(line => line.split(",")[0])
       .map(p => p.trim().toUpperCase())
-      .filter(p => p.length > 0);
-
-    console.log("Placas cargadas:", placas); // debug
+      .filter(p => p);
   });
 
-// ---- BÚSQUEDA EN TIEMPO REAL ----
+// Búsqueda en tiempo real
 input.addEventListener("input", () => {
   const busqueda = input.value.toUpperCase().trim();
-
   resultadoDiv.innerHTML = "";
 
   if (busqueda.length === 0) return;
 
-  const coincidencias = placas.filter(p =>
-    p.startsWith(busqueda)
-  );
+  // ===== CONTADOR GLOBAL POR USUARIO =====
+  const usuario = localStorage.getItem("usuarioActivo");
+  const stats = JSON.parse(localStorage.getItem("consultas")) || {};
+  stats[usuario] = (stats[usuario] || 0) + 1;
+  localStorage.setItem("consultas", JSON.stringify(stats));
 
-  // 👉 Contar SOLO cuando hay intento real
-  totalConsultas++;
-  contadorDiv.innerText = `Total de consultas: ${totalConsultas}`;
+  contadorDiv.innerText = `Tus consultas: ${stats[usuario]}`;
+
+  const coincidencias = placas.filter(p => p.startsWith(busqueda));
 
   if (coincidencias.length > 0) {
-    resultadoDiv.innerHTML = coincidencias
-      .map(p => `🚗 ${p}`)
-      .join("<br>");
+    resultadoDiv.innerHTML = coincidencias.map(p => `🚗 ${p}`).join("<br>");
   } else {
     resultadoDiv.innerHTML = "❌ No se encontraron coincidencias";
   }
+
+  // Si es Admin, refresca panel
+  if (usuario === "Admin") {
+    mostrarEstadisticasAdmin();
+  }
 });
+
+// ============================
+// PANEL ADMIN
+// ============================
+function mostrarEstadisticasAdmin() {
+  let panel = document.getElementById("panelAdmin");
+
+  if (!panel) {
+    panel = document.createElement("div");
+    panel.id = "panelAdmin";
+    panel.style.marginTop = "20px";
+    panel.style.padding = "10px";
+    panel.style.borderTop = "1px solid #ccc";
+    document.getElementById("app").appendChild(panel);
+  }
+
+  const stats = JSON.parse(localStorage.getItem("consultas")) || {};
+  let totalGeneral = 0;
+
+  let html = "<h3>📊 Estadísticas (Admin)</h3>";
+
+  for (const u in stats) {
+    html += `<div>👤 ${u}: <strong>${stats[u]}</strong></div>`;
+    totalGeneral += stats[u];
+  }
+
+  html += `<hr><div><strong>Total general: ${totalGeneral}</strong></div>`;
+
+  panel.innerHTML = html;
+}
