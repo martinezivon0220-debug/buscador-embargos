@@ -2,12 +2,17 @@
 // USUARIOS
 // ============================
 const usuarios = [
-  { user: "Admin", pass: "1234", rol: "admin" },
-  { user: "capturador1", pass: "veh5678", rol: "user" },
-  { user: "capturador2", pass: "veh5678", rol: "user" },
-  { user: "capturador3", pass: "veh5678", rol: "user" }
-];
-
+  { user: "Admin", pass: "1234" },
+  { user: "capturador1", pass: "veh5678" },
+  { user: "capturador2", pass: "veh5678" },
+  { user: "capturador3", pass: "veh5678" },
+  { user: "capturador4", pass: "veh5678" },
+  { user: "capturador5", pass: "veh5678" },
+  { user: "capturador6", pass: "veh5678" },
+  { user: "capturador7", pass: "veh5678" },
+  { user: "capturador8", pass: "veh5678" },
+  { user: "capturador9", pass: "veh5678" },
+  { user: "capturador10", pass: "veh5678" }
 // ============================
 // LOGIN
 // ============================
@@ -133,3 +138,4 @@ input.addEventListener("input", () => {
       "<span style='color:red'>❌ No se encontraron coincidencias</span>";
   }
 });
+
