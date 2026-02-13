@@ -75,7 +75,7 @@ const resultadoDiv = document.getElementById("resultado");
 const contadorDiv = document.getElementById("contador");
 
 // Cargar CSV
-fetch("placas.csv")
+fetch("https://docs.google.com/spreadsheets/d/1jaO5h7ToObK5ckPCPcgrLihHyiKILdTeR9ebKAZbLkk/edit?gid=0#gid=0")
   .then(r => r.text())
   .then(data => {
     placas = data
@@ -143,3 +143,4 @@ function mostrarEstadisticasAdmin() {
 
   panel.innerHTML = html;
 }
+
